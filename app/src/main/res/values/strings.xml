@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Reproductor de Peliculas</string>
+
+    <string-array name="gender_array">
+        <item>Selecciona un género</item>
+        <item>Femenino</item>
+        <item>Masculino</item>
+    </string-array>
+
+
+        <string name="anterior">Anterior</string>
+        <string name="siguiente">Siguiente</string>
+        <string name="play_pause">PLAY/PAUSE</string>
+        <string name="AcceleRacers">Pero Ya No</string>
+
+
+</resources>
