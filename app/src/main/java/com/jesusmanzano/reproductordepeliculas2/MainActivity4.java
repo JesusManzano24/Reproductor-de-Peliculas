@@ -95,7 +95,7 @@ public class MainActivity4 extends AppCompatActivity {
             imageViewaccion.setImageResource(R.drawable.accion);
             imageViewaccion.setEnabled(true);
             imageViewaccion.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity4.this, caricaturas.class);
+                Intent intent = new Intent(MainActivity4.this, accion.class);
                 startActivity(intent);
             });
         } else if (edadInt >= 18) {
@@ -109,14 +109,14 @@ public class MainActivity4 extends AppCompatActivity {
             imageViewaccion.setImageResource(R.drawable.accion);
             imageViewaccion.setEnabled(true);
             imageViewaccion.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity4.this, caricaturas.class);
+                Intent intent = new Intent(MainActivity4.this, accion.class);
                 startActivity(intent);
             });
 
             imageViewterror.setImageResource(R.drawable.terror);
             imageViewterror.setEnabled(true);
             imageViewterror.setOnClickListener(v -> {
-                Intent intent = new Intent(MainActivity4.this, caricaturas.class);
+                Intent intent = new Intent(MainActivity4.this, terror.class);
                 startActivity(intent);
             });
         }

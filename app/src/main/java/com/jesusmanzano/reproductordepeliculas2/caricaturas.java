@@ -16,14 +16,24 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
+
+import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.ExecutionException;
 
 public class caricaturas extends AppCompatActivity {
     VideoView videoView;
@@ -101,84 +111,75 @@ public class caricaturas extends AppCompatActivity {
             }
         });
 
-        AcceleRacers.setOnClickListener(v -> checkProfilePhoto(() -> {
+        AcceleRacers.setOnClickListener(v -> {
             videoView.setVideoURI(Uri.parse(initialVideoPath));
             videoView.start();
             nombre.setText(R.string.AcceleRacers);
-        }));
+        });
 
-        AcceleRacers1.setOnClickListener(v -> checkProfilePhoto(() -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.go;
+        AcceleRacers1.setOnClickListener(v -> {
+            String videoPath = "android.resource://" + getPackageName() +"/" + R.raw.go;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Go AcceleRacers";
             nombre.setText(info);
-        }));
+        });
 
-        Battleforce5.setOnClickListener(v -> checkProfilePhoto(() -> {
+        Battleforce5.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.bf5curiosidades;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Battle Force 5 Curiosidades";
             nombre.setText(info);
-        }));
+        });
 
-        Battleforce51.setOnClickListener(v -> checkProfilePhoto(() -> {
+        Battleforce51.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.drive_to_survive;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Localizado Y Perdido";
             nombre.setText(info);
-        }));
+        });
 
-        johnnytest.setOnClickListener(v -> checkProfilePhoto(() -> {
+        johnnytest.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.regresoajohnny_mon;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Regreso a Johnny-mon";
             nombre.setText(info);
-        }));
+        });
 
-        jonytest1.setOnClickListener(v -> checkProfilePhoto(() -> {
+        jonytest1.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.johnny_el_lanzallamas;
             videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "johnny el Lanzallamas";
+            videoView.start();String info = "johnny el Lanzallamas";
             nombre.setText(info);
-        }));
+        });
 
-        Jovenestitanes.setOnClickListener(v -> checkProfilePhoto(() -> {
+        Jovenestitanes.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.jovenes;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Se Acabo La Cita";
             nombre.setText(info);
-        }));
+        });
 
-        thundercats.setOnClickListener(v -> checkProfilePhoto(() -> {
+        thundercats.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.thundercats_opening;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "thundercats Opening";
             nombre.setText(info);
-        }));
+        });
 
-        dbz.setOnClickListener(v -> checkProfilePhoto(() -> {
+        dbz.setOnClickListener(v -> {
             String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.dragon_ball_z;
             videoView.setVideoURI(Uri.parse(videoPath));
             videoView.start();
             String info = "Vegeta Destruye la máquina de fuerza :(";
             nombre.setText(info);
-        }));
-
-        // Llamar al método para mostrar el mensaje de bienvenida
-        displayWelcomeMessage();
-
-        // Configurar el Intent para el nuevo botón
-        nuevaActividadButton.setOnClickListener(v -> {
-            Intent intent = new Intent(caricaturas.this, MainActivity3.class);
-            startActivity(intent);
         });
+
     }
 
     private void displayWelcomeMessage() {
@@ -218,64 +219,16 @@ public class caricaturas extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Foto de Perfil")
                     .setMessage("Debes de tomar una foto de perfil antes de reproducir.")
-                    .setPositiveButton("Aceptar", (dialog, which) -> takeProfilePhoto())
+                    //.setPositiveButton("Aceptar", (dialog, which) -> takeProfilePhoto())
                     .setNegativeButton("Cancelar", (dialog, which) -> {
                         // Regresar al menú principal
-                        Intent intent = new Intent(caricaturas.this, MainActivity.class);
+                        Intent intent = new Intent(caricaturas.this, MainActivity4.class);
                         startActivity(intent);
                         finish();
                     })
                     .show();
         } else {
             onSuccess.run();
-        }
-    }
-
-    private void takeProfilePhoto() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
-        } else {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            // Guardar la imagen en el almacenamiento
-            profilePhotoPath = saveImageToExternalStorage(imageBitmap);
-            Toast.makeText(this, "Foto de perfil guardada", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String saveImageToExternalStorage(Bitmap bitmap) {
-        String fileName = "profile_photo.jpg";
-        File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), fileName);
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            return file.getAbsolutePath();
-        } catch (IOException e) {
-            Log.e("SaveImage", "Error al guardar la imagen", e);
-            return null;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                takeProfilePhoto();
-            } else {
-                Toast.makeText(this, "Permisos de cámara y almacenamiento denegados", Toast.LENGTH_SHORT).show();
-            }
         }
     }
 }

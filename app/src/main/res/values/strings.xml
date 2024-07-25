@@ -8,10 +8,11 @@
     </string-array>
 
 
-        <string name="anterior">Anterior</string>
-        <string name="siguiente">Siguiente</string>
-        <string name="play_pause">PLAY/PAUSE</string>
-        <string name="AcceleRacers">Pero Ya No</string>
+    <string name="anterior">Anterior</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="play_pause">PLAY/PAUSE</string>
+    <string name="AcceleRacers">go</string>
+    <string name="Deadpool">Contando las balas</string>
 
 
 </resources>
