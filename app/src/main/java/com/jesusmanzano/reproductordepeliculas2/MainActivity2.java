@@ -18,9 +18,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat.Type;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class MainActivity2 extends AppCompatActivity {
     private Button playButton;
@@ -76,6 +78,11 @@ public class MainActivity2 extends AppCompatActivity {
                 return;
             }
 
+            if (isUserExists(name)) {
+                Toast.makeText(this, "El usuario ya existe. Por favor, elija otro nombre.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             saveUserData(name, age, gender);
             Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show();
 
@@ -89,32 +96,41 @@ public class MainActivity2 extends AppCompatActivity {
         dialog.show();
     }
 
-    private void saveUserData(String nombre, int Edad, String genero) {
+    private boolean isUserExists(String name) {
         String filename = "UserData.txt";
-        String fileContents = "nombre:" + nombre + "\n" + "Edad:" + Edad + "\n" + "genero:" + genero;
-        FileOutputStream fos = null;
+        StringBuilder fileContent = new StringBuilder();
 
         try {
-            fos = openFileOutput(filename, Context.MODE_PRIVATE);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            if (fos != null) {
-                fos.write(fileContents.getBytes());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(openFileInput(filename)));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                fileContent.append(line).append("\n");
             }
+            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        try {
-            if (fos != null) {
-                fos.close();
+        String[] users = fileContent.toString().split("\n\n");
+        for (String user : users) {
+            if (user.contains("nombre:" + name)) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    private void saveUserData(String nombre, int edad, String genero) {
+        String filename = "UserData.txt";
+        String fileContents = "nombre:" + nombre + "\n" + "Edad:" + edad + "\n" + "genero:" + genero + "\n\n";
+        FileOutputStream fos = null;
+
+        try {
+            fos = openFileOutput(filename, Context.MODE_APPEND);
+            fos.write(fileContents.getBytes());
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
-

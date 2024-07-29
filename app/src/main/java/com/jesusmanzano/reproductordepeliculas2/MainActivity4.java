@@ -3,6 +3,7 @@ package com.jesusmanzano.reproductordepeliculas2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +24,9 @@ public class MainActivity4 extends AppCompatActivity {
     private ImageView imageViewCaricaturas;
     private ImageView imageViewaccion;
     private ImageView imageViewterror;
+    private TextView textViewCaricaturas;
+    private TextView textViewAccion;
+    private TextView textViewTerror;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,9 @@ public class MainActivity4 extends AppCompatActivity {
         imageViewCaricaturas = findViewById(R.id.caricatura);
         imageViewaccion = findViewById(R.id.accion);
         imageViewterror = findViewById(R.id.terror);
+        textViewCaricaturas = findViewById(R.id.text_caricatura);
+        textViewAccion = findViewById(R.id.text_accion);
+        textViewTerror = findViewById(R.id.text_terror);
 
         // Mostrar el nombre y la edad del usuario
         displayWelcomeMessage();
@@ -66,9 +73,9 @@ public class MainActivity4 extends AppCompatActivity {
         // Extraer el nombre y la edad del usuario
         for (String line : contenidoArchivo.split("\n")) {
             if (line.startsWith("nombre:")) {
-                nombre = line.split(":")[1];
+                nombre = line.split(":")[1].trim();
             } else if (line.startsWith("Edad:")) {
-                edad = line.split(":")[1];
+                edad = line.split(":")[1].trim();
             }
         }
 
@@ -76,16 +83,23 @@ public class MainActivity4 extends AppCompatActivity {
         Textobienvenido.setText("Hola " + nombre + ", de acuerdo a tu edad " + edad + " tienes disponible");
 
         // Clasificación de contenido basada en la edad
-        int edadInt = Integer.parseInt(edad.trim());
+        int edadInt = Integer.parseInt(edad);
         if (edadInt < 12) {
             imageViewCaricaturas.setImageResource(R.drawable.cartoon_network);
+            textViewCaricaturas.setText("Caricaturas");
             imageViewCaricaturas.setEnabled(true);
             imageViewCaricaturas.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, caricaturas.class);
                 startActivity(intent);
             });
-        } else if (edadInt > 12 && edadInt <= 18) {
+
+            textViewAccion.setVisibility(View.GONE);
+            imageViewaccion.setVisibility(View.GONE);
+            textViewTerror.setVisibility(View.GONE);
+            imageViewterror.setVisibility(View.GONE);
+        } else if (edadInt >= 12 && edadInt <= 18) {
             imageViewCaricaturas.setImageResource(R.drawable.cartoon_network);
+            textViewCaricaturas.setText("Caricaturas");
             imageViewCaricaturas.setEnabled(true);
             imageViewCaricaturas.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, caricaturas.class);
@@ -93,13 +107,18 @@ public class MainActivity4 extends AppCompatActivity {
             });
 
             imageViewaccion.setImageResource(R.drawable.accion);
+            textViewAccion.setText("Acción");
             imageViewaccion.setEnabled(true);
             imageViewaccion.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, accion.class);
                 startActivity(intent);
             });
-        } else if (edadInt >= 18) {
+
+            textViewTerror.setVisibility(View.GONE);
+            imageViewterror.setVisibility(View.GONE);
+        } else if (edadInt > 18) {
             imageViewCaricaturas.setImageResource(R.drawable.cartoon_network);
+            textViewCaricaturas.setText("Caricaturas");
             imageViewCaricaturas.setEnabled(true);
             imageViewCaricaturas.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, caricaturas.class);
@@ -107,6 +126,7 @@ public class MainActivity4 extends AppCompatActivity {
             });
 
             imageViewaccion.setImageResource(R.drawable.accion);
+            textViewAccion.setText("Acción");
             imageViewaccion.setEnabled(true);
             imageViewaccion.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, accion.class);
@@ -114,6 +134,7 @@ public class MainActivity4 extends AppCompatActivity {
             });
 
             imageViewterror.setImageResource(R.drawable.terror);
+            textViewTerror.setText("Terror");
             imageViewterror.setEnabled(true);
             imageViewterror.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity4.this, terror.class);

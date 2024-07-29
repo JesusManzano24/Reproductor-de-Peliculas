@@ -14,6 +14,16 @@
         android:textColor="#FFFF00"
         android:fontFamily="serif"
         android:text="Menu" />
+
+    <Button
+        android:id="@+id/Cambiarusuario"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_marginStart="280dp"
+        android:layout_marginTop="670dp"
+        android:textColor="#FFFF00"
+        android:fontFamily="serif"
+        android:text="Cambiar usuario" />
     <ImageView
         android:id="@+id/imgusuario"
         android:layout_width="100dp"
@@ -25,6 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="100dp"
+        android:background="@color/white"
         android:fontFamily="sans-serif-black"
         android:text="Hola:"
         android:textColor="@color/black"
@@ -76,7 +87,6 @@
         android:textColor="#FFFF00"
         android:fontFamily="serif"
         android:text="+5's" />
-
     <Button
         android:id="@+id/AcceleRacers"
         android:layout_width="wrap_content"
@@ -141,5 +151,9 @@
         android:layout_marginStart="250dp"
         android:layout_marginTop="610dp"
         android:text="9" />
+
+
+
+
 
 </RelativeLayout>

@@ -13,6 +13,16 @@
         android:textColor="#FFFF00"
         android:fontFamily="serif"
         android:text="Menu" />
+
+    <Button
+        android:id="@+id/Cambiarusuario"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_marginStart="280dp"
+        android:layout_marginTop="670dp"
+        android:textColor="#FFFF00"
+        android:fontFamily="serif"
+        android:text="Cambiar usuario" />
     <ImageView
         android:id="@+id/imgusuario"
         android:layout_width="100dp"
@@ -31,7 +41,7 @@
 
 
     <VideoView
-        android:id="@+id/video1"
+        android:id="@+id/video2"
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:layout_marginTop="160dp"/>

@@ -50,15 +50,14 @@ public class MainActivity extends AppCompatActivity {
             splashImage.setTranslationY(bounceY);
         });
 
-        // Iniciar la animación
         bounceAnimator.start();
 
         // Redirigir después de 3 segundos
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(MainActivity.this, MainActivity2.class);
             startActivity(intent);
-            finish(); // Opcional: finaliza la actividad actual si no deseas volver a ella
-        }, 2000); // 3000 milisegundos (3 segundos)
+            finish();
+        }, 5000);
     }
 }
 

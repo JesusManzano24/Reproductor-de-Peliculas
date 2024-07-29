@@ -3,17 +3,22 @@ package com.jesusmanzano.reproductordepeliculas2;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -32,6 +37,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 
@@ -40,7 +47,7 @@ public class accion extends AppCompatActivity {
     Button Avengers;
     Button deadpool;
     Button Avengers1;
-    Button IronMan;;
+    Button IronMan;
     Button galaga;
     Button ungenio;
     Button yosoy;
@@ -49,11 +56,12 @@ public class accion extends AppCompatActivity {
     Button Atrasar;
     Button Adelantar;
     Button play_pause;
-    Button nuevaActividadButton; // Nuevo botón
+    Button nuevaActividadButton;
+    Button nuevaActividadButton2;
     TextView nombre;
     TextView usuarioyedad;
-
-
+    private ImageView Foto;
+    private boolean profilePhotoTaken = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +82,25 @@ public class accion extends AppCompatActivity {
         Adelantar = findViewById(R.id.Adelantar);
         play_pause = findViewById(R.id.play_pause);
         nuevaActividadButton = findViewById(R.id.Atras);
+        nuevaActividadButton2 = findViewById(R.id.Cambiarusuario);
 
         nombre = findViewById(R.id.nombre);
         usuarioyedad = findViewById(R.id.usuarioyedad);
+        Foto = findViewById(R.id.imgusuario);
 
-        // Carga el archivo de video inicial
-        String initialVideoPath = "android.resource://" + getPackageName() + "/" + R.raw.deadpool;
-        videoView.setVideoURI(Uri.parse(initialVideoPath));
+        // Recuperar y mostrar la foto de perfil si existe
+        loadProfilePhoto();
+
+        // Configurar los oyentes de clic para los botones de selección de video
+        deadpool.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.deadpool, R.string.Deadpool));
+        Avengers.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.avengers, "Wanda y Visión vs Midnigth y Corvus Glaive -"));
+        Avengers1.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.avenger1, "Wanda y Visión vs Midnigth y Corvus Glaive Part2"));
+        IronMan.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.nuevomark50, "Maw y Cull llegan a la Tierra  Nuevo Mark 50 "));
+        galaga.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.galaga, "ese hombre esta jugando galaga"));
+        ungenio.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.ungenio, "Un genio, millonario, playboy, filantropo.."));
+        yosoy.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.yosoyironman, "Yo Soy Iron Man-Avengers Endgame"));
+        ultron.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.avengersageofultron, "Batalla final en Sokovia-Avengers Age of Ultron"));
+        ultron2.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.eradeultron, "Paz en Nuestros Tiempos"));
 
         play_pause.setOnClickListener(v -> {
             if (videoView.isPlaying()) {
@@ -108,75 +128,6 @@ public class accion extends AppCompatActivity {
             }
         });
 
-        deadpool.setOnClickListener(v -> {
-            videoView.setVideoURI(Uri.parse(initialVideoPath));
-            videoView.start();
-            nombre.setText(R.string.Deadpool);
-        });
-
-        Avengers.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.avengers;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Wanda y Visión vs Midnigth y Corvus Glaive -";
-            nombre.setText(info);
-        });
-
-        Avengers1.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.avenger1;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Wanda y Visión vs Midnigth y Corvus Glaive Part2";
-            nombre.setText(info);
-        });
-
-        IronMan.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.nuevomark50;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Maw y Cull llegan a la Tierra  Nuevo Mark 50 ";
-            nombre.setText(info);
-        });
-
-        galaga.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.galaga;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "ese hombre esta jugando galaga";
-            nombre.setText(info);
-        });
-
-        ungenio.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.ungenio;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Un genio,millonario, playboy, filantropo..";nombre.setText(info);
-        });
-
-        yosoy.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.yosoyironman;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Yo Soy Iron Man-Avengers Endgame";
-            nombre.setText(info);
-        });
-
-        ultron.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.avengersageofultron;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Batalla final en Sokovia-Avengers Age of Ultron";
-            nombre.setText(info);
-        });
-
-        ultron2.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.eradeultron;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Vegeta Destruye la máquina de fuerza :(";
-            nombre.setText(info);
-        });
-
         // Llamar al método para mostrar el mensaje de bienvenida
         displayWelcomeMessage();
 
@@ -185,6 +136,22 @@ public class accion extends AppCompatActivity {
             Intent intent = new Intent(accion.this, MainActivity4.class);
             startActivity(intent);
         });
+        nuevaActividadButton2.setOnClickListener(v -> {
+            Intent intent = new Intent(accion.this, MainActivity3.class);
+            startActivity(intent);
+        });
+    }
+
+    private void loadProfilePhoto() {
+        try {
+            FileInputStream fis = openFileInput("profile_photo.png");
+            Bitmap photo = BitmapFactory.decodeStream(fis);
+            Foto.setImageBitmap(photo);
+            profilePhotoTaken = true;
+            fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void displayWelcomeMessage() {
@@ -219,4 +186,71 @@ public class accion extends AppCompatActivity {
         usuarioyedad.setText("Nombre: " + nombre + "\nEdad: " + edad);
     }
 
+    private void checkProfilePhotoAndLoadVideo(int videoResId, int infoResId) {
+        if (!profilePhotoTaken) {
+            showProfilePhotoDialog(() -> loadVideo(videoResId, getString(infoResId)));
+        } else {
+            loadVideo(videoResId, getString(infoResId));
+        }
+    }
+
+    private void checkProfilePhotoAndLoadVideo(int videoResId, String info) {
+        if (!profilePhotoTaken) {
+            showProfilePhotoDialog(() -> loadVideo(videoResId, info));
+        } else {
+            loadVideo(videoResId, info);
+        }
+    }
+
+    private void showProfilePhotoDialog(Runnable onPhotoTaken) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Para poder ver el video es necesario que pongas una foto de perfil.");
+        builder.setPositiveButton("Aceptar", (dialog, which) -> takeProfilePhoto(onPhotoTaken));
+        builder.setNegativeButton("Cancelar", (dialog, which) -> {
+            Intent intent = new Intent(accion.this, MainActivity4.class);
+            startActivity(intent);
+            finish();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void takeProfilePhoto(Runnable onPhotoTaken) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            Foto.setImageBitmap(photo);
+            profilePhotoTaken = true;
+            try {
+                FileOutputStream fos = openFileOutput("profile_photo.png", MODE_PRIVATE);
+                photo.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error al guardar la foto, intente de nuevo", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(accion.this, MainActivity4.class);
+                startActivity(intent);
+                finish();
+            }
+        } else {
+            Intent intent = new Intent(accion.this, MainActivity4.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    private void loadVideo(int videoResId, String info) {
+        String videoPath = "android.resource://" + getPackageName() + "/" + videoResId;
+        videoView.setVideoURI(Uri.parse(videoPath));
+        videoView.start();
+        nombre.setText(info);
+    }
 }
+

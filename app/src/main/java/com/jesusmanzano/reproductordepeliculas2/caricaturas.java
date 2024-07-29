@@ -1,5 +1,6 @@
 package com.jesusmanzano.reproductordepeliculas2;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,11 +11,13 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -35,28 +38,49 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.ExecutionException;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.VideoView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class caricaturas extends AppCompatActivity {
     VideoView videoView;
-    Button AcceleRacers;
-    Button AcceleRacers1;
-    Button Battleforce5;
-    Button Battleforce51;
-    Button johnnytest;
-    Button jonytest1;
-    Button Jovenestitanes;
-    Button thundercats;
-    Button dbz;
     Button Atrasar;
     Button Adelantar;
     Button play_pause;
-    Button nuevaActividadButton; // Nuevo botón
+    Button nuevaActividadButton;
+    Button nuevaActividadButton2;
     TextView nombre;
     TextView usuarioyedad;
     Button Atras;
+    private ImageView Foto;
+    private boolean profilePhotoTaken = false;
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_PERMISSION = 2;
-    private String profilePhotoPath = null;
+    // Botones para seleccionar videos
+    Button videoButton1, videoButton2, videoButton3, videoButton4, videoButton5;
+    Button videoButton6, videoButton7, videoButton8, videoButton9;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,34 +88,47 @@ public class caricaturas extends AppCompatActivity {
         setContentView(R.layout.activity_caricaturas);
 
         videoView = findViewById(R.id.video1);
-        AcceleRacers = findViewById(R.id.AcceleRacers);
-        AcceleRacers1 = findViewById(R.id.AcceleRacers1);
-        Battleforce5 = findViewById(R.id.Battleforce5);
-        Battleforce51 = findViewById(R.id.battleforce51);
-        johnnytest = findViewById(R.id.johnnytest);
-        jonytest1 = findViewById(R.id.johnnytest1);
-        Jovenestitanes = findViewById(R.id.losjovenestitanes);
-        thundercats = findViewById(R.id.thundercats);
-        dbz = findViewById(R.id.dbz);
+
         Atrasar = findViewById(R.id.Atrasar);
         Adelantar = findViewById(R.id.Adelantar);
         play_pause = findViewById(R.id.play_pause);
+        nuevaActividadButton = findViewById(R.id.Atras);
+        nuevaActividadButton2 = findViewById(R.id.Cambiarusuario);
         Atras = findViewById(R.id.Atras);
 
         nombre = findViewById(R.id.nombre);
         usuarioyedad = findViewById(R.id.usuarioyedad);
+        Foto = findViewById(R.id.imgusuario);
 
-        // Carga el archivo de video inicial
-        String initialVideoPath = "android.resource://" + getPackageName() + "/" + R.raw.acelera;
-        videoView.setVideoURI(Uri.parse(initialVideoPath));
+        // Inicializar los botones de selección de video
+        videoButton1 = findViewById(R.id.AcceleRacers);
+        videoButton2 = findViewById(R.id.AcceleRacers1);
+        videoButton3 = findViewById(R.id.Battleforce5);
+        videoButton4 = findViewById(R.id.battleforce51);
+        videoButton5 = findViewById(R.id.johnnytest);
+        videoButton6 = findViewById(R.id.johnnytest1);
+        videoButton7 = findViewById(R.id.losjovenestitanes);
+        videoButton8 = findViewById(R.id.thundercats);
+        videoButton9 = findViewById(R.id.dbz);
+
+        // Configurar los oyentes de clic para los botones de selección de video
+        videoButton1.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.acelera));
+        videoButton2.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.go));
+        videoButton3.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.bf5curiosidades));
+        videoButton4.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.drive_to_survive));
+        videoButton5.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.johnny_el_lanzallamas));
+        videoButton6.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.regresoajohnny_mon));
+        videoButton7.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.jovenes));
+        videoButton8.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.thundercats_opening));
+        videoButton9.setOnClickListener(v -> checkProfilePhotoAndLoadVideo(R.raw.dragon_ball_z));
 
         play_pause.setOnClickListener(v -> {
             if (videoView.isPlaying()) {
                 videoView.pause();
-                Toast.makeText(caricaturas.this, "Pausa", Toast.LENGTH_SHORT).show();
+                play_pause.setText("Play");
             } else {
                 videoView.start();
-                Toast.makeText(caricaturas.this, "Play", Toast.LENGTH_SHORT).show();
+                play_pause.setText("Pause");
             }
         });
 
@@ -111,75 +148,20 @@ public class caricaturas extends AppCompatActivity {
             }
         });
 
-        AcceleRacers.setOnClickListener(v -> {
-            videoView.setVideoURI(Uri.parse(initialVideoPath));
-            videoView.start();
-            nombre.setText(R.string.AcceleRacers);
-        });
+        // Llamar al método para mostrar el mensaje de bienvenida
+        displayWelcomeMessage();
 
-        AcceleRacers1.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() +"/" + R.raw.go;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Go AcceleRacers";
-            nombre.setText(info);
+        // Configurar el Intent para el nuevo botón
+        nuevaActividadButton.setOnClickListener(v -> {
+            Intent intent = new Intent(caricaturas.this, MainActivity3.class);
+            // Pasar la ruta de la foto de perfil a la nueva actividad
+            intent.putExtra("profilePhotoPath", getProfilePhotoPath());
+            startActivity(intent);
         });
-
-        Battleforce5.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.bf5curiosidades;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Battle Force 5 Curiosidades";
-            nombre.setText(info);
+        nuevaActividadButton.setOnClickListener(v -> {
+            Intent intent = new Intent(caricaturas.this, MainActivity4.class);
+            startActivity(intent);
         });
-
-        Battleforce51.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.drive_to_survive;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Localizado Y Perdido";
-            nombre.setText(info);
-        });
-
-        johnnytest.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.regresoajohnny_mon;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Regreso a Johnny-mon";
-            nombre.setText(info);
-        });
-
-        jonytest1.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.johnny_el_lanzallamas;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();String info = "johnny el Lanzallamas";
-            nombre.setText(info);
-        });
-
-        Jovenestitanes.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.jovenes;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Se Acabo La Cita";
-            nombre.setText(info);
-        });
-
-        thundercats.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.thundercats_opening;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "thundercats Opening";
-            nombre.setText(info);
-        });
-
-        dbz.setOnClickListener(v -> {
-            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.dragon_ball_z;
-            videoView.setVideoURI(Uri.parse(videoPath));
-            videoView.start();
-            String info = "Vegeta Destruye la máquina de fuerza :(";
-            nombre.setText(info);
-        });
-
     }
 
     private void displayWelcomeMessage() {
@@ -214,21 +196,70 @@ public class caricaturas extends AppCompatActivity {
         usuarioyedad.setText("Nombre: " + nombre + "\nEdad: " + edad);
     }
 
-    private void checkProfilePhoto(Runnable onSuccess) {
-        if (profilePhotoPath == null) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Foto de Perfil")
-                    .setMessage("Debes de tomar una foto de perfil antes de reproducir.")
-                    //.setPositiveButton("Aceptar", (dialog, which) -> takeProfilePhoto())
-                    .setNegativeButton("Cancelar", (dialog, which) -> {
-                        // Regresar al menú principal
-                        Intent intent = new Intent(caricaturas.this, MainActivity4.class);
-                        startActivity(intent);
-                        finish();
-                    })
-                    .show();
+    private void checkProfilePhotoAndLoadVideo(int videoResId) {
+        if (!profilePhotoTaken) {
+            showProfilePhotoDialog(() -> loadVideo(videoResId));
         } else {
-            onSuccess.run();
+            loadVideo(videoResId);
         }
     }
+
+    private void showProfilePhotoDialog(Runnable onPhotoTaken) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Para poder ver el video es necesario que pongas una foto de perfil.");
+        builder.setPositiveButton("Aceptar", (dialog, which) -> takeProfilePhoto(onPhotoTaken));
+        builder.setNegativeButton("Cancelar", (dialog, which) -> {
+            Intent intent = new Intent(caricaturas.this, MainActivity4.class);
+            startActivity(intent);
+            finish();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void takeProfilePhoto(Runnable onPhotoTaken) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, 1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            Foto.setImageBitmap(photo);
+            profilePhotoTaken = true;
+            try {
+                FileOutputStream fos = openFileOutput("profile_photo.png", MODE_PRIVATE);
+                photo.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error al guardar la foto, intente de nuevo", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(caricaturas.this, MainActivity4.class);
+                startActivity(intent);
+                finish();
+            }
+        } else {
+            Intent intent = new Intent(caricaturas.this, MainActivity4.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    private void loadVideo(int videoResId) {
+        String videoPath = "android.resource://" + getPackageName() + "/" + videoResId;
+        videoView.setVideoURI(Uri.parse(videoPath));
+        videoView.start();
+        play_pause.setText("Pause");
+    }
+
+    private String getProfilePhotoPath() {
+        return getFilesDir().getAbsolutePath() + "/profile_photo.png";
+    }
 }
+
+
+
+
